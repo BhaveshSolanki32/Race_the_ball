@@ -52,7 +52,7 @@ public class winloose : MonoBehaviour
     [SerializeField] GameObject[] vict_glass;
     [SerializeField] CinemachineVirtualCamera cm_cam;
     public GameObject[] can_go;
-
+    bool in_can_check=false;//check that ball dont trigger in_can event twice
 
 
     private void OnCollisionEnter(UnityEngine.Collision coll)
@@ -81,6 +81,13 @@ public class winloose : MonoBehaviour
         }
 
     }
+
+    void OnTriggerExit(Collider coll)
+    {
+        if(coll.gameObject.tag=="winner")
+        Time.timeScale=1;
+    }
+
     private void OnTriggerEnter(Collider coll)
     {
         switch (coll.gameObject.tag)
@@ -133,6 +140,9 @@ public class winloose : MonoBehaviour
                 break;
 
             case "in_canon":
+                in_can_check=!in_can_check;
+                if(in_can_check)
+                {
                 FindObjectOfType<movement>().start = false;
                 FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
                 multbar_txt.SetActive(false);
@@ -140,12 +150,14 @@ public class winloose : MonoBehaviour
                 tap_particle.SetActive(true);
                 tap_text.SetActive(true);
                 tap_bar.SetActive(true);
+                }
                 break;
             case "final":
                 FindObjectOfType<movement>().start = false;
                 FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
                 break;
             case "winner":
+                Time.timeScale = .5f;
                 break;
         }
     }
@@ -180,6 +192,7 @@ public class winloose : MonoBehaviour
             timer += Time.deltaTime;
             if (timer > 10)
             {
+                tap_bool=false;
                 tap_timeup();
             }
 
@@ -243,8 +256,6 @@ public class winloose : MonoBehaviour
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
         Invoke("shoot_can", 1.8f);
-       can_go[k].GetComponent<Transform>().DOScaleZ(20.88227f, 1.1f).SetLoops(1,LoopType.Yoyo);
-        can_go[k].GetComponent<Transform>().DOLocalMove(new Vector3(0.239f, 0.418f, 0f),1.1f,false);
 
     }
     float maxendval = 0;
@@ -280,7 +291,9 @@ public class winloose : MonoBehaviour
         {
             vict_glass[i].GetComponent<BoxCollider>().isTrigger = true;
         }
-       transform.DOJump(throw_to, 12, 1, 8, false).SetEase(Ease.Linear);
+        float velo = Vector3.Distance(transform.position,throw_to)/16.97f+42;
+        GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);
+
     } 
 
 }
