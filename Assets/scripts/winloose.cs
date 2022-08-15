@@ -1,5 +1,4 @@
 using Cinemachine;
-using DG.Tweening;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -255,6 +254,7 @@ public class winloose : MonoBehaviour
         X_disp.SetActive(true);
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
+        //cannon_anim.SetInteger("can_shoot_int",k);
         Invoke("shoot_can", 1.8f);
 
     }
@@ -278,19 +278,22 @@ public class winloose : MonoBehaviour
 
     void shoot_can()
     {
-        cm_cam.m_Lens.FieldOfView = 133;
-        float j;
-        if (maxendval != 8)
-        {
-            j = maxendval - 1;
-        }
-        else { j = 4; }
 
-      Vector3  throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
+        float j;
+
+        if (maxendval != 8) j = maxendval - 1;
+        else  j = 4; 
+
         for (int i = 0; i < j; i++)
         {
             vict_glass[i].GetComponent<BoxCollider>().isTrigger = true;
         }
+
+        cm_cam.m_Lens.FieldOfView = 139;        
+        
+
+      Vector3  throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
+        
         float velo = Vector3.Distance(transform.position,throw_to)/16.97f+42;
         GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);
 
