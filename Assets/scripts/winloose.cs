@@ -165,75 +165,11 @@ public class winloose : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (lost)
-        {
-            if (countdown >= 1)
-            {
-                if (timer_ring.fillAmount > 0)
-                { timer_ring.fillAmount -= 0.015f; }
-                else
-                {
-                    if (countdown != 1)
-                    { timer_ring.fillAmount = 1; }
-                    countdown -= 1;
-                    timer_txt.text = "" + countdown;
-                }
-            }
-            if (countdown == 0)
-            {
-                FindObjectOfType<pause_menu>().restart();
-            }
+        if (lost) lost_ui_init(); //timer>>restart
 
-        }  //timer>>restart
-
-        if (tap_bool)
-        {
-            timer += Time.deltaTime;
-            if (timer > 10)
-            {
-                tap_bool=false;
-                tap_timeup();
-            }
-
-            if (transform.position.x < 1 && transform.position.x > -1)
-            {
-                max_slidvalue = canons[0];k = 0;
-            }
-            if (transform.position.x > 1.2f)
-            {
-                max_slidvalue = canons[1];k = 1;
-            }
-            if (transform.position.x < -1.2f)
-            {
-                max_slidvalue = canons[2];k = 2;
-            }
-
-            slid_values[0].text = "X" + max_slidvalue + "-";
-            slid_values[1].text = "X" + Mathf.Round(0.5f + (max_slidvalue / 2)) + "-";
-            slid_values[2].text = "X" + 1 + "-";
-
-            float scale_increase = Mathf.Lerp(0.2166198f, 0.3351325f, tap_scale_lerp);
-            tap_text.transform.localScale = new Vector3(scale_increase, scale_increase + 0.05942f, tap_text.transform.localScale.z);
-
-            tap_scale_lerp += tap_scale_sped;
-            tap_scale_lerp = Mathf.Clamp01(tap_scale_lerp);
-            if (tap_scale_lerp == 1)
-            {
-                tap_scale_lerp = 0;
-            }
-
-            if (Input.touchCount > 0)
-            {
-                if (Input.GetTouch(0).phase == TouchPhase.Began)
-                {
-                    rate += 0.09f;
-                }
-            }
-            rate -= 0.01f;
-            rate = Mathf.Clamp(rate, 0f, 2f);
-            tap_slid.value = rate;
-        }
+        if (tap_bool)  tap_tap_sys();
     }
+
     void loost()
     {
         Time.timeScale = 1f;
@@ -244,6 +180,7 @@ public class winloose : MonoBehaviour
         FindObjectOfType<rewind>().loosecheck = true;
         pausebtn.SetActive(false);
     }
+    
     void tap_timeup()
     {
 
@@ -254,7 +191,7 @@ public class winloose : MonoBehaviour
         X_disp.SetActive(true);
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
-        //cannon_anim.SetInteger("can_shoot_int",k);
+        cannon_anim.SetInteger("can_shoot_int",k);
         Invoke("shoot_can", 1.8f);
 
     }
@@ -298,5 +235,75 @@ public class winloose : MonoBehaviour
         GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);
 
     } 
+
+
+    void tap_tap_sys()
+    {
+        timer += Time.deltaTime;
+            if (timer > 10)
+            {
+                tap_bool=false;
+                tap_timeup();
+            }
+
+            if (transform.position.x < 1 && transform.position.x > -1)
+            {
+                max_slidvalue = canons[0];k = 0;
+            }
+            if (transform.position.x > 1.2f)
+            {
+                max_slidvalue = canons[1];k = 1;
+            }
+            if (transform.position.x < -1.2f)
+            {
+                max_slidvalue = canons[2];k = 2;
+            }
+
+            slid_values[0].text = "X" + max_slidvalue + "-";
+            slid_values[1].text = "X" + Mathf.Round(0.5f + (max_slidvalue / 2)) + "-";
+            slid_values[2].text = "X" + 1 + "-";
+
+            float scale_increase = Mathf.Lerp(0.2166198f, 0.3351325f, tap_scale_lerp);
+            tap_text.transform.localScale = new Vector3(scale_increase, scale_increase + 0.05942f, tap_text.transform.localScale.z);
+
+            tap_scale_lerp += tap_scale_sped;
+            tap_scale_lerp = Mathf.Clamp01(tap_scale_lerp);
+            if (tap_scale_lerp == 1)
+            {
+                tap_scale_lerp = 0;
+            }
+
+            if (Input.touchCount > 0)
+            {
+                if (Input.GetTouch(0).phase == TouchPhase.Began)
+                {
+                    rate += 0.09f;
+                }
+            }
+            rate -= 0.01f;
+            rate = Mathf.Clamp(rate, 0f, 2f);
+            tap_slid.value = rate;
+    }
+
+ void lost_ui_init()
+ {
+    if (countdown >= 1)
+            {
+                if (timer_ring.fillAmount > 0)
+                { timer_ring.fillAmount -= 0.015f; }
+                else
+                {
+                    if (countdown != 1)
+                    { timer_ring.fillAmount = 1; }
+                    countdown -= 1;
+                    timer_txt.text = "" + countdown;
+                }
+            }
+            if (countdown == 0)
+            {
+                FindObjectOfType<pause_menu>().restart();
+            }
+ }
+
 
 }

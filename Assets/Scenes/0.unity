@@ -9773,8 +9773,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 0
   serializedVersion: 2
-  m_Size: {x: 0.022882326, y: 0.022983033, z: 0.009896954}
-  m_Center: {x: 0.0003510208, y: 0.011027491, z: -0.0048286477}
+  m_Size: {x: 0.022882324, y: 0.02298303, z: 0.012222106}
+  m_Center: {x: 0.00035102142, y: 0.011027493, z: -0.003666071}
 --- !u!1 &311836784
 GameObject:
   m_ObjectHideFlags: 0
@@ -15117,8 +15117,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 0
   serializedVersion: 2
-  m_Size: {x: 0.022882324, y: 0.022983033, z: 0.009896954}
-  m_Center: {x: 0.0003512592, y: 0.011027502, z: -0.0048286477}
+  m_Size: {x: 0.022882324, y: 0.02298303, z: 0.0115884105}
+  m_Center: {x: 0.00035125998, y: 0.011027506, z: -0.0039829183}
 --- !u!1001 &497494263
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -43577,7 +43577,7 @@ MeshRenderer:
   m_IgnoreNormalsForChartDetection: 0
   m_ImportantGI: 0
   m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
+  m_SelectedEditorRenderState: 2
   m_MinimumChartSize: 4
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
@@ -63402,8 +63402,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 0
   serializedVersion: 2
-  m_Size: {x: 0.022882324, y: 0.022983033, z: 0.009896954}
-  m_Center: {x: 0.0003512592, y: 0.011027478, z: -0.0048286477}
+  m_Size: {x: 0.022882324, y: 0.02298303, z: 0.011190815}
+  m_Center: {x: 0.00035125983, y: 0.0110274805, z: -0.0041817166}
 --- !u!1001 &1906076017
 PrefabInstance:
   m_ObjectHideFlags: 0
