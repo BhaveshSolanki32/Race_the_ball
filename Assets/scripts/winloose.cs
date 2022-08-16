@@ -160,6 +160,7 @@ public class winloose : MonoBehaviour
                 break;
         }
     }
+
     int k;
     void coingainoff() => FindObjectOfType<winloose>().coinbase_animator.SetBool("coin_gain", false);
 
@@ -180,10 +181,9 @@ public class winloose : MonoBehaviour
         FindObjectOfType<rewind>().loosecheck = true;
         pausebtn.SetActive(false);
     }
-    
+
     void tap_timeup()
     {
-
         tap_bool = false;
         tap_particle.SetActive(false);
         tap_text.SetActive(false);
@@ -191,10 +191,10 @@ public class winloose : MonoBehaviour
         X_disp.SetActive(true);
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
-        cannon_anim.SetInteger("can_shoot_int",k);
+        //cannon_anim.SetInteger("can_shoot_int",k);
         Invoke("shoot_can", 1.8f);
-
     }
+
     float maxendval = 0;
     float max_end_val() //max value after tap end
     {
@@ -252,11 +252,11 @@ public class winloose : MonoBehaviour
             }
             if (transform.position.x > 1.2f)
             {
-                max_slidvalue = canons[1];k = 1;
+                max_slidvalue = canons[2];k = 1;
             }
             if (transform.position.x < -1.2f)
             {
-                max_slidvalue = canons[2];k = 2;
+                max_slidvalue = canons[1];k = 2;
             }
 
             slid_values[0].text = "X" + max_slidvalue + "-";
@@ -285,9 +285,9 @@ public class winloose : MonoBehaviour
             tap_slid.value = rate;
     }
 
- void lost_ui_init()
- {
-    if (countdown >= 1)
+    void lost_ui_init()
+    {
+        if (countdown >= 1)
             {
                 if (timer_ring.fillAmount > 0)
                 { timer_ring.fillAmount -= 0.015f; }
@@ -303,7 +303,7 @@ public class winloose : MonoBehaviour
             {
                 FindObjectOfType<pause_menu>().restart();
             }
- }
+    }
 
 
 }
