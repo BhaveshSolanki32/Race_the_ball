@@ -51,15 +51,16 @@ public class winloose : MonoBehaviour
     [SerializeField] GameObject[] vict_glass;
     [SerializeField] CinemachineVirtualCamera cm_cam;
     public GameObject[] can_go;
-    bool in_can_check=false;//check that ball dont trigger in_can event twice
-
-
+    bool in_can_check=true;//check that ball dont trigger in_can event twice
+    [SerializeField] GameObject[] shattered_glass;
+    
     private void OnCollisionEnter(UnityEngine.Collision coll)
     {
         switch (coll.gameObject.tag)
         {
             case "winner":
                 {
+                    glass_shatter(coll.gameObject,false);
                     win_ui.SetActive(true);
                     gameObject.GetComponent<Rigidbody>().isKinematic = true;
                     coinbase.SetActive(false);
@@ -81,11 +82,11 @@ public class winloose : MonoBehaviour
 
     }
 
-    void OnTriggerExit(Collider coll)
-    {
-        if(coll.gameObject.tag=="winner")
-        Time.timeScale=1;
-    }
+    // void OnTriggerExit(Collider coll)
+    // {
+    //     if(coll.gameObject.tag=="winner")
+    //     Time.timeScale=1;
+    // }
 
     private void OnTriggerEnter(Collider coll)
     {
@@ -139,9 +140,9 @@ public class winloose : MonoBehaviour
                 break;
 
             case "in_canon":
-                in_can_check=!in_can_check;
+                
                 if(in_can_check)
-                {
+                {in_can_check=false;
                 FindObjectOfType<movement>().start = false;
                 FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
                 multbar_txt.SetActive(false);
@@ -157,6 +158,8 @@ public class winloose : MonoBehaviour
                 break;
             case "winner":
                 Time.timeScale = .5f;
+                glass_shatter(coll.gameObject,true);
+                
                 break;
         }
     }
@@ -191,7 +194,7 @@ public class winloose : MonoBehaviour
         X_disp.SetActive(true);
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
-        //cannon_anim.SetInteger("can_shoot_int",k);
+        cannon_anim.SetInteger("can_shoot_int",k);
         Invoke("shoot_can", 1.8f);
     }
 
@@ -215,23 +218,19 @@ public class winloose : MonoBehaviour
 
     void shoot_can()
     {
-
         float j;
 
         if (maxendval != 8) j = maxendval - 1;
         else  j = 4; 
 
-        for (int i = 0; i < j; i++)
-        {
-            vict_glass[i].GetComponent<BoxCollider>().isTrigger = true;
-        }
+        vict_glass[(int)j].GetComponent<BoxCollider>().isTrigger = false;
 
         cm_cam.m_Lens.FieldOfView = 139;        
         
 
       Vector3  throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
         
-        float velo = Vector3.Distance(transform.position,throw_to)/16.97f+42;
+        float velo = Vector3.Distance(transform.position,throw_to)/16.97f+45;
         GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);
 
     } 
@@ -304,6 +303,21 @@ public class winloose : MonoBehaviour
                 FindObjectOfType<pause_menu>().restart();
             }
     }
+    
+    void glass_shatter(GameObject coll,bool grav)
+    {
+        int rand = Random.Range(0,3);
+        GameObject gs=Instantiate(shattered_glass[rand],coll.transform.position,shattered_glass[rand].transform.rotation);
+        coll.SetActive(false);
+       if(!grav) {Destroy(gs.GetComponent<Rigidbody>()); Debug.Log("del");}
+       else{
+        foreach(Transform x in gs.transform){
+            x.gameObject.GetComponent<Rigidbody>().AddExplosionForce(1500f,transform.position,2f,300.0f);
+           // Debug.Log("FORCE");
+        }
+       }     
+           
 
-
+            
+    }
 }
