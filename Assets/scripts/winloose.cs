@@ -1,5 +1,6 @@
 using Cinemachine;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -53,6 +54,7 @@ public class winloose : MonoBehaviour
     public GameObject[] can_go;
     bool in_can_check=true;//check that ball dont trigger in_can event twice
     [SerializeField] GameObject[] shattered_glass;
+    float time_limit=0; //time limit for magnetism
     
     private void OnCollisionEnter(UnityEngine.Collision coll)
     {
@@ -82,12 +84,6 @@ public class winloose : MonoBehaviour
 
     }
 
-    // void OnTriggerExit(Collider coll)
-    // {
-    //     if(coll.gameObject.tag=="winner")
-    //     Time.timeScale=1;
-    // }
-
     private void OnTriggerEnter(Collider coll)
     {
         switch (coll.gameObject.tag)
@@ -102,6 +98,7 @@ public class winloose : MonoBehaviour
                 break;
 
             case "speed trigger":
+                //cm_cam.m_Lens.FieldOfView = 140;
                 GetComponent<Rigidbody>().AddForce(coll.transform.forward * speedupforce);
                 if (speed_particle.isPlaying)
                 {
@@ -150,6 +147,7 @@ public class winloose : MonoBehaviour
                 tap_particle.SetActive(true);
                 tap_text.SetActive(true);
                 tap_bar.SetActive(true);
+                vict_glass[0].GetComponent<BoxCollider>().isTrigger=true;
                 }
                 break;
             case "final":
@@ -157,21 +155,29 @@ public class winloose : MonoBehaviour
                 FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
                 break;
             case "winner":
-                Time.timeScale = .5f;
                 glass_shatter(coll.gameObject,true);
-                
+                break;
+            case "magnet":
+                coll.gameObject.SetActive(false);
+                InvokeRepeating("magnetism",0,0.03f);
                 break;
         }
     }
 
-    int k;
+    int k; //whuch cannon the ball is
     void coingainoff() => FindObjectOfType<winloose>().coinbase_animator.SetBool("coin_gain", false);
+
+    void timeToNormal() => Time.timeScale =1f;
 
     void FixedUpdate()
     {
-        if (lost) lost_ui_init(); //timer>>restart
-
+        if(lost) lost_ui_init(); //timer>>restart
         if (tap_bool)  tap_tap_sys();
+    }
+
+    void Update()
+    {
+        raycaster();
     }
 
     void loost()
@@ -215,6 +221,15 @@ public class winloose : MonoBehaviour
         return 1;
     }
 
+    public void raycaster()
+    {
+        RaycastHit hit;
+             if(Physics.Raycast(transform.position,FindObjectOfType<movement>().dummyplayer.transform.forward,out hit,2.65f) && hit.transform.tag=="winner")
+            {
+                Time.timeScale=0.3f;
+                Invoke("timeToNormal",0.25f);
+            }
+    }
 
     void shoot_can()
     {
@@ -225,7 +240,7 @@ public class winloose : MonoBehaviour
 
         vict_glass[(int)j].GetComponent<BoxCollider>().isTrigger = false;
 
-        cm_cam.m_Lens.FieldOfView = 139;        
+        cm_cam.m_Lens.FieldOfView = 140;        
         
 
       Vector3  throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
@@ -306,18 +321,57 @@ public class winloose : MonoBehaviour
     
     void glass_shatter(GameObject coll,bool grav)
     {
-        int rand = Random.Range(0,3);
+        int rand = Random.Range(0,2);
         GameObject gs=Instantiate(shattered_glass[rand],coll.transform.position,shattered_glass[rand].transform.rotation);
         coll.SetActive(false);
-       if(!grav) {Destroy(gs.GetComponent<Rigidbody>()); Debug.Log("del");}
-       else{
-        foreach(Transform x in gs.transform){
-            x.gameObject.GetComponent<Rigidbody>().AddExplosionForce(1500f,transform.position,2f,300.0f);
-           // Debug.Log("FORCE");
-        }
-       }     
-           
+        Rigidbody[] childRBgs=gs.GetComponentsInChildren<Rigidbody>();
+       
+
+        foreach(Rigidbody x in childRBgs)
+        {
+             if(grav) x.AddExplosionForce(750f,transform.position,130f,3f);
+             else Destroy(x);                         
+        }  
 
             
     }
+
+
+    
+    void magnetism()
+    {
+         time_limit+=Time.deltaTime;
+        if(time_limit>=4){CancelInvoke("magnetism"); time_limit=0;}
+       Collider[] coll= Physics.OverlapSphere(transform.position,4);
+       
+       foreach(Collider x in coll){
+            if(x.tag=="coined"){
+                // Instantiate(coin_particle, x.gameObject.transform.position, transform.rotation);
+                // PlayerPrefs.SetInt("Totalcoins", PlayerPrefs.GetInt("Totalcoins") + 10);
+                // scoretxt.text = "" + PlayerPrefs.GetInt("Totalcoins");
+                // coinbase_animator.SetBool("coin_gain", true);
+                // Invoke("coingainoff", 0.34f);
+                // x.gameObject.SetActive(false);
+                
+                StartCoroutine(moveTowards( x.gameObject,this.gameObject,0.01f,0.2f));
+
+
+            }
+       }
+
+    }
+
+    IEnumerator moveTowards( GameObject postGO,GameObject target,float duration,float dist_jump)
+    { 
+        while(postGO.transform.position!=target.transform.position)
+        {
+           float numOfJumps= Vector3.Distance(postGO.transform.position,target.transform.position)/dist_jump;
+           postGO.transform.position = Vector3.MoveTowards(postGO.transform.position,target.transform.position,dist_jump);
+            yield return new WaitForSeconds(duration/numOfJumps);
+        }
+        StopCoroutine("moveTowards");
+        yield return null;
+    }
+
+
 }

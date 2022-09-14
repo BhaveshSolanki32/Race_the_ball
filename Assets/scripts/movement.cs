@@ -22,6 +22,9 @@ public class movement : MonoBehaviour
     Touch touch;
     public float sensititvty;
     Vector3 touchpos;
+
+    [SerializeField] ParticleSystem speed_particle;
+
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -30,6 +33,7 @@ public class movement : MonoBehaviour
     public void begin()
     {
         Invoke("launched", 0.8f);
+        Invoke("particleOnLaunch",2f);
         homeui.GetComponent<Animator>().SetBool("launch", true);
     }
 
@@ -66,8 +70,18 @@ public class movement : MonoBehaviour
         transform.position = new Vector3(Mathf.Clamp(transform.position.x, -2.483f, 2.47f), transform.position.y, transform.position.z);
         dummyplayer.transform.position = new Vector3(transform.position.x*0.5f, transform.position.y, transform.position.z);
     }
+    void particleOnLaunch()
+    {  
+        if (speed_particle.isPlaying)
+        {
+            speed_particle.Stop();
+        }
+        speed_particle.Play();
+    }
+
     void launched()
-    {
+    {       
+
         start = true;
         FindObjectOfType<winloose>().coinbase.SetActive(true);
         FindObjectOfType<winloose>().pausebtn.SetActive(true);
