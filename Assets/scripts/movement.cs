@@ -46,23 +46,18 @@ public class movement : MonoBehaviour
             {
                 if (rb.velocity.z <= velocitylimit)
                 { rb.AddForce(movforce); }
+
+
                 if (Input.touchCount > 0)
                 {
                     touch = Input.GetTouch(0);
-                    if (touch.phase == TouchPhase.Began || touch.phase == TouchPhase.Stationary)
-                    {
-                        touchpos = touch.position;
-                        touchpos.z = 10;
-                    }
-                    if (touch.phase == TouchPhase.Moved )
-                    {
-                        Vector3 touchendpos = touch.position;
-                        touchendpos.z = 10;
 
-                        float posdiff = (Camera.main.ScreenToWorldPoint(touchendpos).x - Camera.main.ScreenToWorldPoint(touchpos).x);
-                        transform.position = new Vector3((posdiff * PlayerPrefs.GetFloat("sense")) + transform.position.x, transform.position.y, transform.position.z);
-                    }
+                    if (touch.phase == TouchPhase.Ended)
+                        st=0;
 
+                    if(touch.phase==TouchPhase.Moved)
+                        ballMove(new Vector3(touch.position.x,touch.position.y,10));
+                        
                 }
             }
 
@@ -86,6 +81,16 @@ public class movement : MonoBehaviour
         FindObjectOfType<winloose>().coinbase.SetActive(true);
         FindObjectOfType<winloose>().pausebtn.SetActive(true);
         FindObjectOfType<band_lancher>().gamestart = true;
+    }
+
+    float st=0,nd;//st previos recorded positon,, nd new recorded touch post
+
+    void ballMove(Vector3 touch)
+    {
+        nd=Camera.main.ScreenToWorldPoint(touch).x;
+        if(st==0)st=nd;
+        transform.position=new Vector3(transform.position.x + (nd-st)*PlayerPrefs.GetFloat("sense") ,transform.position.y,transform.position.z);
+        st=Camera.main.ScreenToWorldPoint(touch).x;
     }
 
 }

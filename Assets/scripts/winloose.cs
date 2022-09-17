@@ -164,7 +164,7 @@ public class winloose : MonoBehaviour
         }
     }
 
-    int k; //whuch cannon the ball is
+    int k; //which cannon the ball is
     void coingainoff() => FindObjectOfType<winloose>().coinbase_animator.SetBool("coin_gain", false);
 
     void timeToNormal() => Time.timeScale =1f;
@@ -240,13 +240,13 @@ public class winloose : MonoBehaviour
 
         vict_glass[(int)j].GetComponent<BoxCollider>().isTrigger = false;
 
-        cm_cam.m_Lens.FieldOfView = 140;        
-        
+        cm_cam.m_Lens.FieldOfView = 140;         
 
       Vector3  throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
-        
-        float velo = Vector3.Distance(transform.position,throw_to)/16.97f+45;
-        GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);
+       
+        float velo = Vector3.Distance(transform.position,throw_to)/16.97f+42;
+        can_go[k].GetComponentInChildren<MeshCollider>().enabled=false;
+        GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);       
 
     } 
 
@@ -340,24 +340,15 @@ public class winloose : MonoBehaviour
     
     void magnetism()
     {
-         time_limit+=Time.deltaTime;
+        time_limit+=Time.deltaTime;
+
         if(time_limit>=4){CancelInvoke("magnetism"); time_limit=0;}
-       Collider[] coll= Physics.OverlapSphere(transform.position,4);
+
+        Collider[] coll= Physics.OverlapSphere(transform.position,4);
        
-       foreach(Collider x in coll){
-            if(x.tag=="coined"){
-                // Instantiate(coin_particle, x.gameObject.transform.position, transform.rotation);
-                // PlayerPrefs.SetInt("Totalcoins", PlayerPrefs.GetInt("Totalcoins") + 10);
-                // scoretxt.text = "" + PlayerPrefs.GetInt("Totalcoins");
-                // coinbase_animator.SetBool("coin_gain", true);
-                // Invoke("coingainoff", 0.34f);
-                // x.gameObject.SetActive(false);
-                
+        foreach(Collider x in coll)
+            if(x.tag=="coined")
                 StartCoroutine(moveTowards( x.gameObject,this.gameObject,0.01f,0.2f));
-
-
-            }
-       }
 
     }
 

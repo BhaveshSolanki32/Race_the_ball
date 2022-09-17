@@ -17700,10 +17700,10 @@ MonoBehaviour:
   m_FillRect: {fileID: 692330593}
   m_HandleRect: {fileID: 599333566}
   m_Direction: 0
-  m_MinValue: 0.01
-  m_MaxValue: 0.1
+  m_MinValue: 0.1
+  m_MaxValue: 0.65
   m_WholeNumbers: 0
-  m_Value: 0.05
+  m_Value: 0.32
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls:
@@ -22061,7 +22061,7 @@ GameObject:
   - component: {fileID: 650667861}
   - component: {fileID: 650667860}
   m_Layer: 0
-  m_Name: Arch
+  m_Name: magnet
   m_TagString: magnet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -23398,8 +23398,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 650667859}
   m_LocalRotation: {x: 1, y: 0, z: 0, w: 0}
-  m_LocalPosition: {x: -1.08, y: 0.65, z: -1.92}
-  m_LocalScale: {x: 0.46031508, y: 0.46031508, z: 0.46031508}
+  m_LocalPosition: {x: -1.128, y: 0.784, z: -1.92}
+  m_LocalScale: {x: 0.65019506, y: 0.65019506, z: 0.65019506}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 17
@@ -34343,7 +34343,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_BindingMode: 4
   m_FollowOffset: {x: 0, y: 2.1299999, z: -2.159998}
-  m_XDamping: 20
+  m_XDamping: 0.33
   m_YDamping: 0.4
   m_ZDamping: 0.4
   m_AngularDampingMode: 0
