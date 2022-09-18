@@ -55,6 +55,7 @@ public class winloose : MonoBehaviour
     bool in_can_check=true;//check that ball dont trigger in_can event twice
     [SerializeField] GameObject[] shattered_glass;
     float time_limit=0; //time limit for magnetism
+    [SerializeField] GameObject magnet_particle;
     
     private void OnCollisionEnter(UnityEngine.Collision coll)
     {
@@ -158,14 +159,17 @@ public class winloose : MonoBehaviour
                 glass_shatter(coll.gameObject,true);
                 break;
             case "magnet":
-                coll.gameObject.SetActive(false);
+                GameObject particle=Instantiate(magnet_particle,transform.position,Quaternion.identity);
+                coll.gameObject.SetActive(false);                
+                particle.transform.SetParent(transform);
                 InvokeRepeating("magnetism",0,0.03f);
+                Destroy(particle,4.3f);
                 break;
         }
     }
 
     int k; //which cannon the ball is
-    void coingainoff() => FindObjectOfType<winloose>().coinbase_animator.SetBool("coin_gain", false);
+    void coingainoff() => coinbase_animator.SetBool("coin_gain", false);
 
     void timeToNormal() => Time.timeScale =1f;
 
@@ -249,7 +253,6 @@ public class winloose : MonoBehaviour
         GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);       
 
     } 
-
 
     void tap_tap_sys()
     {
