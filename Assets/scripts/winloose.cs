@@ -56,7 +56,11 @@ public class winloose : MonoBehaviour
     [SerializeField] GameObject[] shattered_glass;
     float time_limit=0; //time limit for magnetism
     [SerializeField] GameObject magnet_particle;
-    
+    [SerializeField] GameObject magnet_collect_particle;
+    [SerializeField] GameObject tap_tap_particle;
+    [SerializeField] Camera ui_VFX_camera;
+
+
     private void OnCollisionEnter(UnityEngine.Collision coll)
     {
         switch (coll.gameObject.tag)
@@ -159,11 +163,13 @@ public class winloose : MonoBehaviour
                 glass_shatter(coll.gameObject,true);
                 break;
             case "magnet":
+                GameObject magnet_vfx = coll.transform.GetChild(0).gameObject;
+                Destroy(magnet_vfx
                 GameObject particle=Instantiate(magnet_particle,transform.position,Quaternion.identity);
                 coll.gameObject.SetActive(false);                
                 particle.transform.SetParent(transform);
-                InvokeRepeating("magnetism",0,0.03f);
-                Destroy(particle,4.3f);
+                InvokeRepeating("magnetism",0,0.02f);
+                Destroy(particle,7f);
                 break;
         }
     }
@@ -291,9 +297,13 @@ public class winloose : MonoBehaviour
             }
 
             if (Input.touchCount > 0)
-            {
-                if (Input.GetTouch(0).phase == TouchPhase.Began)
+            { 
+                Touch touch = Input.GetTouch(0);
+                Vector3 touch_post=touch.position;
+                touch_post.z=10;
+                if (touch.phase == TouchPhase.Began)
                 {
+                    Instantiate(tap_tap_particle,ui_VFX_camera.ScreenToWorldPoint(touch_post),Quaternion.identity);
                     rate += 0.09f;
                 }
             }
@@ -343,15 +353,15 @@ public class winloose : MonoBehaviour
     
     void magnetism()
     {
-        time_limit+=Time.deltaTime;
+        time_limit+=0.02f;
 
-        if(time_limit>=4){CancelInvoke("magnetism"); time_limit=0;}
+        if(time_limit>=7f){CancelInvoke("magnetism"); time_limit=0;}
 
         Collider[] coll= Physics.OverlapSphere(transform.position,4);
        
         foreach(Collider x in coll)
             if(x.tag=="coined")
-                StartCoroutine(moveTowards( x.gameObject,this.gameObject,0.01f,0.2f));
+                StartCoroutine(moveTowards( x.gameObject,this.gameObject,0.02f,0.2f));
 
     }
 

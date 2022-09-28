@@ -33,7 +33,7 @@ public class movement : MonoBehaviour
     public void begin()
     {
         Invoke("launched", 0.8f);
-        Invoke("particleOnLaunch",2f);
+        Invoke("particleOnLaunch",2.1f);
         homeui.GetComponent<Animator>().SetBool("launch", true);
     }
 
