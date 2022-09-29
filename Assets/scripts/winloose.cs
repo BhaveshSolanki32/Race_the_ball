@@ -164,14 +164,29 @@ public class winloose : MonoBehaviour
                 break;
             case "magnet":
                 GameObject magnet_vfx = coll.transform.GetChild(0).gameObject;
-                Destroy(magnet_vfx
+                magnet_vfx.transform.parent= null;
+                StartCoroutine(magnet_collected(magnet_vfx));
                 GameObject particle=Instantiate(magnet_particle,transform.position,Quaternion.identity);
-                coll.gameObject.SetActive(false);                
+                Destroy(coll.transform.gameObject);
                 particle.transform.SetParent(transform);
                 InvokeRepeating("magnetism",0,0.02f);
                 Destroy(particle,7f);
                 break;
         }
+    }
+
+    IEnumerator magnet_collected(GameObject target)
+    {
+        while (target != null)
+        {
+            target.transform.localScale /= 1.5f;
+            target.transform.position = transform.position;
+            yield return new WaitForSeconds(0.008f);
+        }
+        Destroy(target);
+        StopCoroutine("magnet_collectd");
+        yield return null;
+        
     }
 
     int k; //which cannon the ball is
@@ -307,7 +322,7 @@ public class winloose : MonoBehaviour
                     rate += 0.09f;
                 }
             }
-            rate -= 0.01f;
+            rate -= 0.007f;
             rate = Mathf.Clamp(rate, 0f, 2f);
             tap_slid.value = rate;
     }
