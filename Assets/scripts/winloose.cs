@@ -1,6 +1,6 @@
 using Cinemachine;
-using System.Collections.Generic;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -52,14 +52,14 @@ public class winloose : MonoBehaviour
     [SerializeField] GameObject[] vict_glass;
     [SerializeField] CinemachineVirtualCamera cm_cam;
     public GameObject[] can_go;
-    bool in_can_check=true;//check that ball dont trigger in_can event twice
+    bool in_can_check = true;//check that ball dont trigger in_can event twice
     [SerializeField] GameObject[] shattered_glass;
-    float time_limit=0; //time limit for magnetism
+    float time_limit = 0; //time limit for magnetism
     [SerializeField] GameObject magnet_particle;
     [SerializeField] GameObject magnet_collect_particle;
     [SerializeField] GameObject tap_tap_particle;
+    [SerializeField] GameObject vict_glasstext;
     [SerializeField] Camera ui_VFX_camera;
-
 
     private void OnCollisionEnter(UnityEngine.Collision coll)
     {
@@ -67,7 +67,7 @@ public class winloose : MonoBehaviour
         {
             case "winner":
                 {
-                    glass_shatter(coll.gameObject,false);
+                    glass_shatter(coll.gameObject, false);
                     win_ui.SetActive(true);
                     gameObject.GetComponent<Rigidbody>().isKinematic = true;
                     coinbase.SetActive(false);
@@ -142,17 +142,18 @@ public class winloose : MonoBehaviour
                 break;
 
             case "in_canon":
-                
-                if(in_can_check)
-                {in_can_check=false;
-                FindObjectOfType<movement>().start = false;
-                FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
-                multbar_txt.SetActive(false);
-                tap_bool = true;
-                tap_particle.SetActive(true);
-                tap_text.SetActive(true);
-                tap_bar.SetActive(true);
-                vict_glass[0].GetComponent<BoxCollider>().isTrigger=true;
+
+                if (in_can_check)
+                {
+                    in_can_check = false;
+                    FindObjectOfType<movement>().start = false;
+                    FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
+                    multbar_txt.SetActive(false);
+                    tap_bool = true;
+                    Destroy(Instantiate(tap_particle, tap_particle.transform.position, Quaternion.identity), 9.8f);
+                    tap_text.SetActive(true);
+                    tap_bar.SetActive(true);
+                    vict_glass[0].GetComponent<BoxCollider>().isTrigger = true;
                 }
                 break;
             case "final":
@@ -160,17 +161,17 @@ public class winloose : MonoBehaviour
                 FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
                 break;
             case "winner":
-                glass_shatter(coll.gameObject,true);
+                glass_shatter(coll.gameObject, true);
                 break;
             case "magnet":
                 GameObject magnet_vfx = coll.transform.GetChild(0).gameObject;
-                magnet_vfx.transform.parent= null;
+                magnet_vfx.transform.parent = null;
                 StartCoroutine(magnet_collected(magnet_vfx));
-                GameObject particle=Instantiate(magnet_particle,transform.position,Quaternion.identity);
+                GameObject particle = Instantiate(magnet_particle, transform.position, Quaternion.identity);
                 Destroy(coll.transform.gameObject);
                 particle.transform.SetParent(transform);
-                InvokeRepeating("magnetism",0,0.02f);
-                Destroy(particle,7f);
+                InvokeRepeating("magnetism", 0, 0.02f);
+                Destroy(particle, 7f);
                 break;
         }
     }
@@ -186,18 +187,18 @@ public class winloose : MonoBehaviour
         Destroy(target);
         StopCoroutine("magnet_collectd");
         yield return null;
-        
+
     }
 
     int k; //which cannon the ball is
     void coingainoff() => coinbase_animator.SetBool("coin_gain", false);
 
-    void timeToNormal() => Time.timeScale =1f;
+    void timeToNormal() => Time.timeScale = 1f;
 
     void FixedUpdate()
     {
-        if(lost) lost_ui_init(); //timer>>restart
-        if (tap_bool)  tap_tap_sys();
+        if (lost) lost_ui_init(); //timer>>restart
+        if (tap_bool) tap_tap_sys();
     }
 
     void Update()
@@ -225,7 +226,7 @@ public class winloose : MonoBehaviour
         X_disp.SetActive(true);
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
-        cannon_anim.SetInteger("can_shoot_int",k);
+        cannon_anim.SetInteger("can_shoot_int", k);
         Invoke("shoot_can", 1.8f);
     }
 
@@ -245,15 +246,21 @@ public class winloose : MonoBehaviour
         maxendval = 1;
         return 1;
     }
-
+    GameObject previous_ray_hit;
     public void raycaster()
     {
         RaycastHit hit;
-             if(Physics.Raycast(transform.position,FindObjectOfType<movement>().dummyplayer.transform.forward,out hit,2.65f) && hit.transform.tag=="winner")
+        if (Physics.Raycast(transform.position, FindObjectOfType<movement>().dummyplayer.transform.forward, out hit, 2.65f) && hit.transform.tag == "winner")
+        {
+            if (previous_ray_hit != hit.transform.gameObject)
             {
-                Time.timeScale=0.3f;
-                Invoke("timeToNormal",0.25f);
+                StartCoroutine(magnet_collected(vict_glasstext.transform.GetChild(0).gameObject));
+                Destroy(vict_glasstext.transform.GetChild(0).gameObject);
             }
+            Time.timeScale = 0.3f;
+            Invoke("timeToNormal", 0.25f);
+            previous_ray_hit = hit.transform.gameObject;
+        }
     }
 
     void shoot_can()
@@ -261,132 +268,130 @@ public class winloose : MonoBehaviour
         float j;
 
         if (maxendval != 8) j = maxendval - 1;
-        else  j = 4; 
+        else j = 4;
 
         vict_glass[(int)j].GetComponent<BoxCollider>().isTrigger = false;
 
-        cm_cam.m_Lens.FieldOfView = 140;         
+        cm_cam.m_Lens.FieldOfView = 140;;
+        Vector3 throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
 
-      Vector3  throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
-       
-        float velo = Vector3.Distance(transform.position,throw_to)/16.97f+42;
-        can_go[k].GetComponentInChildren<MeshCollider>().enabled=false;
-        GetComponent<Rigidbody>().velocity=new Vector3(0,velo/2,velo*0.866f);       
+        float velo = Vector3.Distance(transform.position, throw_to) / 16.97f + 42;
+        can_go[k].GetComponentInChildren<MeshCollider>().enabled = false;
+        GetComponent<Rigidbody>().velocity = new Vector3(0, velo / 2, velo * 0.866f);
 
-    } 
+    }
 
     void tap_tap_sys()
     {
         timer += Time.deltaTime;
-            if (timer > 10)
-            {
-                tap_bool=false;
-                tap_timeup();
-            }
+        if (timer > 8)
+        {
+            tap_bool = false;
+            tap_timeup();
+        }
 
-            if (transform.position.x < 1 && transform.position.x > -1)
-            {
-                max_slidvalue = canons[0];k = 0;
-            }
-            if (transform.position.x > 1.2f)
-            {
-                max_slidvalue = canons[2];k = 1;
-            }
-            if (transform.position.x < -1.2f)
-            {
-                max_slidvalue = canons[1];k = 2;
-            }
+        if (transform.position.x < 1 && transform.position.x > -1)
+        {
+            max_slidvalue = canons[0]; k = 0;
+        }
+        if (transform.position.x > 1.2f)
+        {
+            max_slidvalue = canons[2]; k = 1;
+        }
+        if (transform.position.x < -1.2f)
+        {
+            max_slidvalue = canons[1]; k = 2;
+        }
 
-            slid_values[0].text = "X" + max_slidvalue + "-";
-            slid_values[1].text = "X" + Mathf.Round(0.5f + (max_slidvalue / 2)) + "-";
-            slid_values[2].text = "X" + 1 + "-";
+        slid_values[0].text = "X" + max_slidvalue + "-";
+        slid_values[1].text = "X" + Mathf.Round(0.5f + (max_slidvalue / 2)) + "-";
+        slid_values[2].text = "X" + 1 + "-";
 
-            float scale_increase = Mathf.Lerp(0.2166198f, 0.3351325f, tap_scale_lerp);
-            tap_text.transform.localScale = new Vector3(scale_increase, scale_increase + 0.05942f, tap_text.transform.localScale.z);
+        float scale_increase = Mathf.Lerp(0.2166198f, 0.3351325f, tap_scale_lerp);
+        tap_text.transform.localScale = new Vector3(scale_increase, scale_increase + 0.05942f, tap_text.transform.localScale.z);
 
-            tap_scale_lerp += tap_scale_sped;
-            tap_scale_lerp = Mathf.Clamp01(tap_scale_lerp);
-            if (tap_scale_lerp == 1)
+        tap_scale_lerp += tap_scale_sped;
+        tap_scale_lerp = Mathf.Clamp01(tap_scale_lerp);
+        if (tap_scale_lerp == 1)
+        {
+            tap_scale_lerp = 0;
+        }
+
+        if (Input.touchCount > 0)
+        {
+            Touch touch = Input.GetTouch(0);
+            Vector3 touch_post = touch.position;
+            touch_post.z = 10;
+            if (touch.phase == TouchPhase.Began)
             {
-                tap_scale_lerp = 0;
+                Instantiate(tap_tap_particle, ui_VFX_camera.ScreenToWorldPoint(touch_post), Quaternion.identity);
+                rate += 0.09f;
             }
-
-            if (Input.touchCount > 0)
-            { 
-                Touch touch = Input.GetTouch(0);
-                Vector3 touch_post=touch.position;
-                touch_post.z=10;
-                if (touch.phase == TouchPhase.Began)
-                {
-                    Instantiate(tap_tap_particle,ui_VFX_camera.ScreenToWorldPoint(touch_post),Quaternion.identity);
-                    rate += 0.09f;
-                }
-            }
-            rate -= 0.007f;
-            rate = Mathf.Clamp(rate, 0f, 2f);
-            tap_slid.value = rate;
+        }
+        rate -= 0.007f;
+        rate = Mathf.Clamp(rate, 0f, 2f);
+        tap_slid.value = rate;
     }
 
     void lost_ui_init()
     {
         if (countdown >= 1)
-            {
-                if (timer_ring.fillAmount > 0)
-                { timer_ring.fillAmount -= 0.015f; }
-                else
-                {
-                    if (countdown != 1)
-                    { timer_ring.fillAmount = 1; }
-                    countdown -= 1;
-                    timer_txt.text = "" + countdown;
-                }
-            }
-            if (countdown == 0)
-            {
-                FindObjectOfType<pause_menu>().restart();
-            }
-    }
-    
-    void glass_shatter(GameObject coll,bool grav)
-    {
-        int rand = Random.Range(0,2);
-        GameObject gs=Instantiate(shattered_glass[rand],coll.transform.position,shattered_glass[rand].transform.rotation);
-        coll.SetActive(false);
-        Rigidbody[] childRBgs=gs.GetComponentsInChildren<Rigidbody>();
-       
-
-        foreach(Rigidbody x in childRBgs)
         {
-             if(grav) x.AddExplosionForce(750f,transform.position,130f,3f);
-             else Destroy(x);                         
-        }  
+            if (timer_ring.fillAmount > 0)
+            { timer_ring.fillAmount -= 0.015f; }
+            else
+            {
+                if (countdown != 1)
+                { timer_ring.fillAmount = 1; }
+                countdown -= 1;
+                timer_txt.text = "" + countdown;
+            }
+        }
+        if (countdown == 0)
+        {
+            FindObjectOfType<pause_menu>().restart();
+        }
+    }
 
-            
+    void glass_shatter(GameObject coll, bool grav)
+    {
+        int rand = Random.Range(0, 2);
+        GameObject gs = Instantiate(shattered_glass[rand], coll.transform.position, shattered_glass[rand].transform.rotation);
+        coll.SetActive(false);
+        Rigidbody[] childRBgs = gs.GetComponentsInChildren<Rigidbody>();
+
+
+        foreach (Rigidbody x in childRBgs)
+        {
+            if (grav) x.AddExplosionForce(750f, transform.position, 130f, 3f);
+            else Destroy(x);
+        }
+
+
     }
 
 
-    
     void magnetism()
     {
-        time_limit+=0.02f;
+        time_limit += 0.02f;
 
-        if(time_limit>=7f){CancelInvoke("magnetism"); time_limit=0;}
+        if (time_limit >= 7f) { CancelInvoke("magnetism"); time_limit = 0;}
 
-        Collider[] coll= Physics.OverlapSphere(transform.position,4);
-       
-        foreach(Collider x in coll)
-            if(x.tag=="coined")
-                StartCoroutine(moveTowards( x.gameObject,this.gameObject,0.02f,0.2f));
+        Collider[] coll = Physics.OverlapSphere(transform.position, 4);
+
+        foreach (Collider x in coll)
+            if (x.tag == "coined")
+                StartCoroutine(moveTowards(x.gameObject, this.gameObject, 0.02f, 0.2f));
 
     }
 
-    IEnumerator moveTowards( GameObject postGO,GameObject target,float duration,float dist_jump)
-    { 
-        while(postGO.transform.position!=target.transform.position)
+    IEnumerator moveTowards(GameObject postGO, GameObject target, float duration, float dist_jump)
+    {
+        while (postGO.transform.position != target.transform.position)
         {
-           float numOfJumps= Vector3.Distance(postGO.transform.position,target.transform.position)/dist_jump;
-           postGO.transform.position = Vector3.MoveTowards(postGO.transform.position,target.transform.position,dist_jump);
-            yield return new WaitForSeconds(duration/numOfJumps);
+            float numOfJumps = Vector3.Distance(postGO.transform.position, target.transform.position) / dist_jump;
+            postGO.transform.position = Vector3.MoveTowards(postGO.transform.position, target.transform.position, dist_jump);
+            yield return new WaitForSeconds(duration / numOfJumps);
         }
         StopCoroutine("moveTowards");
         yield return null;
