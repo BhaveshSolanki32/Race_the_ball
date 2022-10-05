@@ -60,6 +60,7 @@ public class winloose : MonoBehaviour
     [SerializeField] GameObject tap_tap_particle;
     [SerializeField] GameObject vict_glasstext;
     [SerializeField] Camera ui_VFX_camera;
+    [SerializeField] GameObject vfx_canonblast;
 
     private void OnCollisionEnter(UnityEngine.Collision coll)
     {
@@ -150,7 +151,7 @@ public class winloose : MonoBehaviour
                     FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
                     multbar_txt.SetActive(false);
                     tap_bool = true;
-                    Destroy(Instantiate(tap_particle, tap_particle.transform.position, Quaternion.identity), 9.8f);
+                    Destroy(Instantiate(tap_particle, tap_particle.transform.position, Quaternion.identity), 8f);
                     tap_text.SetActive(true);
                     tap_bar.SetActive(true);
                     vict_glass[0].GetComponent<BoxCollider>().isTrigger = true;
@@ -178,7 +179,7 @@ public class winloose : MonoBehaviour
 
     IEnumerator magnet_collected(GameObject target)
     {
-        while (target != null)
+        while (target.transform.position==transform.position && target.transform.localScale.x<0.1f)
         {
             target.transform.localScale /= 1.5f;
             target.transform.position = transform.position;
@@ -227,7 +228,19 @@ public class winloose : MonoBehaviour
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
         cannon_anim.SetInteger("can_shoot_int", k);
+        Invoke("cannon_blast_vfx", 1.655f);
         Invoke("shoot_can", 1.8f);
+    }
+
+
+    void cannon_blast_vfx()
+    {
+        Vector3 pos= new Vector3(-0.0399999991f, 1.74699998f, 207.449997f);
+        if (k == 0) pos.x = -0.0399999991f;
+        if (k == 2) pos.x = -1.65999997f;
+        if (k == 1) pos.x = 1.42999995f;
+
+        Instantiate(vfx_canonblast, pos, Quaternion.identity);
     }
 
     float maxendval = 0;
@@ -254,7 +267,6 @@ public class winloose : MonoBehaviour
         {
             if (previous_ray_hit != hit.transform.gameObject)
             {
-                StartCoroutine(magnet_collected(vict_glasstext.transform.GetChild(0).gameObject));
                 Destroy(vict_glasstext.transform.GetChild(0).gameObject);
             }
             Time.timeScale = 0.3f;
@@ -292,15 +304,15 @@ public class winloose : MonoBehaviour
 
         if (transform.position.x < 1 && transform.position.x > -1)
         {
-            max_slidvalue = canons[0]; k = 0;
+            max_slidvalue = canons[0]; k = 0; // center
         }
         if (transform.position.x > 1.2f)
         {
-            max_slidvalue = canons[2]; k = 1;
+            max_slidvalue = canons[2]; k = 1; //right
         }
         if (transform.position.x < -1.2f)
         {
-            max_slidvalue = canons[1]; k = 2;
+            max_slidvalue = canons[1]; k = 2; //left
         }
 
         slid_values[0].text = "X" + max_slidvalue + "-";
@@ -359,7 +371,8 @@ public class winloose : MonoBehaviour
         GameObject gs = Instantiate(shattered_glass[rand], coll.transform.position, shattered_glass[rand].transform.rotation);
         coll.SetActive(false);
         Rigidbody[] childRBgs = gs.GetComponentsInChildren<Rigidbody>();
-
+        if(grav)
+        Destroy(gs, 1);
 
         foreach (Rigidbody x in childRBgs)
         {
