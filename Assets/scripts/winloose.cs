@@ -106,11 +106,13 @@ public class winloose : MonoBehaviour
             case "speed trigger":
                 //cm_cam.m_Lens.FieldOfView = 140;
                 GetComponent<Rigidbody>().AddForce(coll.transform.forward * speedupforce);
+                print(GetComponent<Rigidbody>().velocity);
                 if (speed_particle.isPlaying)
                 {
                     speed_particle.Stop();
                 }
-                speed_particle.Play();
+                if(coll.transform.forward.z==1)
+                  speed_particle.Play();
 
                 break;
             case "LID_open":
@@ -151,7 +153,7 @@ public class winloose : MonoBehaviour
                     FindObjectOfType<Rigidbody>().velocity = new Vector3(0, 0, 0);
                     multbar_txt.SetActive(false);
                     tap_bool = true;
-                    Destroy(Instantiate(tap_particle, tap_particle.transform.position, Quaternion.identity), 8f);
+                    tap_particle.SetActive(true);
                     tap_text.SetActive(true);
                     tap_bar.SetActive(true);
                     vict_glass[0].GetComponent<BoxCollider>().isTrigger = true;
@@ -167,6 +169,7 @@ public class winloose : MonoBehaviour
             case "magnet":
                 GameObject magnet_vfx = coll.transform.GetChild(0).gameObject;
                 magnet_vfx.transform.parent = null;
+                Instantiate(magnet_collect_particle, transform.position, Quaternion.identity);
                 StartCoroutine(magnet_collected(magnet_vfx));
                 GameObject particle = Instantiate(magnet_particle, transform.position, Quaternion.identity);
                 Destroy(coll.transform.gameObject);
@@ -225,6 +228,7 @@ public class winloose : MonoBehaviour
         tap_text.SetActive(false);
         tap_bar.SetActive(false);
         X_disp.SetActive(true);
+        tap_particle.SetActive(false);
         X_disp.GetComponent<Text>().text = "X" + max_end_val();
         tap_can.SetBool("tap_end", true);
         cannon_anim.SetInteger("can_shoot_int", k);
@@ -400,9 +404,9 @@ public class winloose : MonoBehaviour
 
     IEnumerator moveTowards(GameObject postGO, GameObject target, float duration, float dist_jump)
     {
+        float numOfJumps = Vector3.Distance(postGO.transform.position, target.transform.position) / dist_jump;
         while (postGO.transform.position != target.transform.position)
         {
-            float numOfJumps = Vector3.Distance(postGO.transform.position, target.transform.position) / dist_jump;
             postGO.transform.position = Vector3.MoveTowards(postGO.transform.position, target.transform.position, dist_jump);
             yield return new WaitForSeconds(duration / numOfJumps);
         }

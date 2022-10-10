@@ -44,8 +44,8 @@ public class movement : MonoBehaviour
             launchstart += Time.deltaTime;
             if (launchstart >= 1.5f)
             {
-                if (rb.velocity.z <= velocitylimit)
-                { rb.AddForce(movforce); }
+               // if (rb.velocity.z <= velocitylimit)
+                  rb.AddForce(movforce);
 
 
                 if (Input.touchCount > 0)
