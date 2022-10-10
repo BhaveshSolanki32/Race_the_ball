@@ -3,8 +3,13 @@ A hypercasual game with unique levels and obstacles(currently in development) So
 ![ball1](https://user-images.githubusercontent.com/66202955/194840768-0296ac70-1f47-45c0-add3-8b38b528c642.gif) 
 
 
-![ball2](https://user-images.githubusercontent.com/66202955/194928732-0d26a981-d88f-492e-9b0b-1d4fb98c31f7.gif)
+
+
+![ball2](https://user-images.githubusercontent.com/66202955/194932010-04cb43d1-1f2c-4d83-b9b3-3cd2cdd2712a.gif)
 
 
 
-![ball3](https://user-images.githubusercontent.com/66202955/194929448-c5f15344-a9d7-4ca2-95e2-9ce19936f997.gif)
+
+
+
+![ball3](https://user-images.githubusercontent.com/66202955/194933729-a2a1d2ce-4cff-4c7e-a7df-5375bd9da41a.gif)
