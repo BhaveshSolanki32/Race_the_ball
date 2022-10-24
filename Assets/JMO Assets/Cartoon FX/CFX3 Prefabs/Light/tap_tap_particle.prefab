@@ -5036,15 +5036,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 19800004, guid: fb7b0526ade434043b350a180d741cf3, type: 3}
       propertyPath: InitialModule.startColor.minColor.b
-      value: 0.9254902
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 19800004, guid: fb7b0526ade434043b350a180d741cf3, type: 3}
       propertyPath: InitialModule.startColor.minColor.g
-      value: 0.65395904
+      value: 0.84112567
       objectReference: {fileID: 0}
     - target: {fileID: 19800004, guid: fb7b0526ade434043b350a180d741cf3, type: 3}
       propertyPath: InitialModule.startColor.minColor.r
-      value: 0
+      value: 0.45660377
       objectReference: {fileID: 0}
     - target: {fileID: 19800004, guid: fb7b0526ade434043b350a180d741cf3, type: 3}
       propertyPath: InitialModule.startColor.minMaxState

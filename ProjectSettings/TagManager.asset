@@ -11,6 +11,10 @@ TagManager:
   - LID_open
   - in_canon
   - last_trig
+  - magnet
+  - FxTemporaire
+  - jumper
+  - sheld
   layers:
   - Default
   - TransparentFX

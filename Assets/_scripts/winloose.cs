@@ -62,6 +62,13 @@ public class winloose : MonoBehaviour
     [SerializeField] Camera ui_VFX_camera;
     [SerializeField] GameObject vfx_canonblast;
 
+    [Space(10)]
+    [SerializeField] GameObject[] obstacles;
+    [SerializeField] ciencam_shake cam_shake;
+    [SerializeField] GameObject debri_vfx;
+    [SerializeField] GameObject sheild_vfx;
+    [SerializeField] color_change_on_ups[] color_change_on_ups;
+
     private void OnCollisionEnter(UnityEngine.Collision coll)
     {
         switch (coll.gameObject.tag)
@@ -79,11 +86,12 @@ public class winloose : MonoBehaviour
 
             case "bar":
                 {
-                    FindObjectOfType<ciencam_shake>().shakeon = true;
+                    cam_shake.shakeon = true;
                     coinbase_animator.SetBool("revive", false);
                     Time.timeScale = 0.2f;
                     FindObjectOfType<movement>().start = false;
                     Invoke("loost", 0.5f);
+
                 }
                 break;
         }
@@ -104,15 +112,11 @@ public class winloose : MonoBehaviour
                 break;
 
             case "speed trigger":
-                //cm_cam.m_Lens.FieldOfView = 140;
                 GetComponent<Rigidbody>().AddForce(coll.transform.forward * speedupforce);
-                print(GetComponent<Rigidbody>().velocity);
-                if (speed_particle.isPlaying)
-                {
-                    speed_particle.Stop();
-                }
-                if(coll.transform.forward.z==1)
-                  speed_particle.Play();
+
+                if (speed_particle.isPlaying) speed_particle.Stop();
+
+                if (coll.transform.forward.z == 1) speed_particle.Play();
 
                 break;
             case "LID_open":
@@ -175,14 +179,55 @@ public class winloose : MonoBehaviour
                 Destroy(coll.transform.gameObject);
                 particle.transform.SetParent(transform);
                 InvokeRepeating("magnetism", 0, 0.02f);
-                Destroy(particle, 7f);
+                Destroy(particle, 7);
+                foreach(color_change_on_ups x in color_change_on_ups)
+                x.color_change_on(Color.red, 70);
+                break;
+            case "jumper":
+                GetComponent<Rigidbody>().AddForce(0, 375, 0);
+                break;
+            case "sheld":
+                sheild_on(coll);
+                break;
+            case "bar":
+                Destroy(coll.gameObject);
+                Instantiate(debri_vfx, coll.transform.position, Quaternion.identity);
+                cam_shake.shakeon = true;
                 break;
         }
     }
 
+    void sheild_on(Collider coll)
+    {
+        Transform coll_vfx = coll.transform.GetChild(0);
+        coll_vfx.SetParent(null);
+        coll_vfx.GetComponent<ParticleSystem>().Play();
+        Destroy(coll_vfx.gameObject, 0.6f);
+        Destroy(coll.gameObject);        
+        GameObject sheild_vfx_temp = Instantiate(sheild_vfx, transform.position, Quaternion.identity);
+        sheild_vfx_temp.transform.SetParent(transform);
+        Destroy(sheild_vfx_temp, 7);
+        foreach (GameObject x in obstacles)
+        {
+            x.GetComponent<Collider>().isTrigger = true;
+        }
+        Invoke("sheild_off", 7);
+    }
+
+    void sheild_off()
+    {
+        foreach (GameObject x in obstacles)
+        {
+            if(x!=null)
+            x.GetComponent<Collider>().isTrigger = false;
+        }
+        //vfx off
+    }
+
+
     IEnumerator magnet_collected(GameObject target)
     {
-        while (target.transform.position==transform.position && target.transform.localScale.x<0.1f)
+        while (target.transform.position == transform.position && target.transform.localScale.x < 0.1f)
         {
             target.transform.localScale /= 1.5f;
             target.transform.position = transform.position;
@@ -239,7 +284,7 @@ public class winloose : MonoBehaviour
 
     void cannon_blast_vfx()
     {
-        Vector3 pos= new Vector3(-0.0399999991f, 1.74699998f, 207.449997f);
+        Vector3 pos = new Vector3(-0.0399999991f, 1.74699998f, 207.449997f);
         if (k == 0) pos.x = -0.0399999991f;
         if (k == 2) pos.x = -1.65999997f;
         if (k == 1) pos.x = 1.42999995f;
@@ -288,7 +333,7 @@ public class winloose : MonoBehaviour
 
         vict_glass[(int)j].GetComponent<BoxCollider>().isTrigger = false;
 
-        cm_cam.m_Lens.FieldOfView = 140;;
+        cm_cam.m_Lens.FieldOfView = 140; ;
         Vector3 throw_to = new Vector3(vict_glass[(int)j].transform.position.x, vict_glass[(int)j].transform.position.y, vict_glass[(int)j].transform.position.z - 0.1f);
 
         float velo = Vector3.Distance(transform.position, throw_to) / 16.97f + 42;
@@ -371,12 +416,13 @@ public class winloose : MonoBehaviour
 
     void glass_shatter(GameObject coll, bool grav)
     {
+        cam_shake.shakeon = true;
         int rand = Random.Range(0, 2);
         GameObject gs = Instantiate(shattered_glass[rand], coll.transform.position, shattered_glass[rand].transform.rotation);
         coll.SetActive(false);
         Rigidbody[] childRBgs = gs.GetComponentsInChildren<Rigidbody>();
-        if(grav)
-        Destroy(gs, 1);
+        if (grav)
+            Destroy(gs, 1);
 
         foreach (Rigidbody x in childRBgs)
         {
@@ -392,7 +438,7 @@ public class winloose : MonoBehaviour
     {
         time_limit += 0.02f;
 
-        if (time_limit >= 7f) { CancelInvoke("magnetism"); time_limit = 0;}
+        if (time_limit >= 7f) { CancelInvoke("magnetism"); time_limit = 0; StopCoroutine("moveTowards"); }
 
         Collider[] coll = Physics.OverlapSphere(transform.position, 4);
 
