@@ -117,7 +117,8 @@ public class winloose : MonoBehaviour
                 if (speed_particle.isPlaying) speed_particle.Stop();
 
                 if (coll.transform.forward.z == 1) speed_particle.Play();
-
+                foreach (color_change_on_ups x in color_change_on_ups)
+                    x.color_change_on(Color.green, 0.7f);
                 break;
             case "LID_open":
                 if (cannon_anim.GetBool("lid_open"))
@@ -181,13 +182,15 @@ public class winloose : MonoBehaviour
                 InvokeRepeating("magnetism", 0, 0.02f);
                 Destroy(particle, 7);
                 foreach(color_change_on_ups x in color_change_on_ups)
-                x.color_change_on(Color.red, 70);
+                      x.color_change_on(Color.yellow , 7);
                 break;
             case "jumper":
                 GetComponent<Rigidbody>().AddForce(0, 375, 0);
                 break;
             case "sheld":
                 sheild_on(coll);
+                foreach (color_change_on_ups x in color_change_on_ups)
+                    x.color_change_on(Color.blue, 7);
                 break;
             case "bar":
                 Destroy(coll.gameObject);
@@ -438,22 +441,22 @@ public class winloose : MonoBehaviour
     {
         time_limit += 0.02f;
 
-        if (time_limit >= 7f) { CancelInvoke("magnetism"); time_limit = 0; StopCoroutine("moveTowards"); }
+        if (time_limit >= 7f) { CancelInvoke("magnetism"); time_limit = 0; StopCoroutine("moveTowards"); magnetism_over = true; }
 
         Collider[] coll = Physics.OverlapSphere(transform.position, 4);
 
         foreach (Collider x in coll)
             if (x.tag == "coined")
-                StartCoroutine(moveTowards(x.gameObject, this.gameObject, 0.02f, 0.2f));
+                StartCoroutine(moveTowards(x.gameObject, transform.position, 0.02f, 0.2f));
 
     }
-
-    IEnumerator moveTowards(GameObject postGO, GameObject target, float duration, float dist_jump)
+    bool magnetism_over = false;
+    IEnumerator moveTowards(GameObject postGO, Vector3 target, float duration, float dist_jump)
     {
-        float numOfJumps = Vector3.Distance(postGO.transform.position, target.transform.position) / dist_jump;
-        while (postGO.transform.position != target.transform.position)
+        float numOfJumps = Vector3.Distance(postGO.transform.position, target) / dist_jump;
+        while (postGO.transform.position != target || !magnetism_over)
         {
-            postGO.transform.position = Vector3.MoveTowards(postGO.transform.position, target.transform.position, dist_jump);
+            postGO.transform.position = Vector3.MoveTowards(postGO.transform.position, target, dist_jump);
             yield return new WaitForSeconds(duration / numOfJumps);
         }
         StopCoroutine("moveTowards");

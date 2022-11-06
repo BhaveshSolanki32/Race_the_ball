@@ -4,57 +4,46 @@ using System.Collections;
 public class color_change_on_ups : MonoBehaviour
 {
 
-    Color color;
     Material material;
+    [SerializeField] float speed;
     float time;
-    [SerializeField] float rapid_change, slow_change;
-    [SerializeField] [Range(0.1f, 1)] float t;
-    private void Start()
-    {
-        material = GetComponent<MeshRenderer>().material;
-    }
+    Color color;
+    float temp_time1;
+    private void Start() => material = GetComponent<MeshRenderer>().material;
 
     public void color_change_on(Color tar_color, float time)
     {
+        StopAllCoroutines();
         this.color = tar_color;
         this.time = time;
-        StartCoroutine("color_change");
-        
+        temp_time1 = Time.time;
+        StartCoroutine("color_changer");
     }
-    //mathf.pingpong
-    IEnumerator color_change()
+    
+    IEnumerator color_changer()
     {
-        while (time >= 1)
-        {     
-            //while(material.color!=color)
-                 material.color = Color.Lerp(material.color, color, t*Time.deltaTime);
-
-            time -= rapid_change;
-            yield return new WaitForSeconds( rapid_change);
-
-            //while (material.color != Color.white)
-                material.color = Color.Lerp(material.color, Color.white, t * Time.deltaTime);
-
-            time -= rapid_change;
-            yield return new WaitForSeconds(rapid_change);
-        }
-        Debug.Log("done");
-        while (time >= 0)
+        
+        while (time >= 0 || material.color != Color.white)
         {
-           // while (material.color != color)
-                material.color = Color.Lerp(material.color, color, t * Time.deltaTime);
-            time -= slow_change;
-            yield return new WaitForSeconds(slow_change);
-          //  while (material.color != Color.white)
-                material.color = Color.Lerp(material.color, Color.white, t * Time.deltaTime);
-            time -= slow_change;
-            yield return new WaitForSeconds(slow_change);
-        }
-        material.color = Color.white;
-        StopCoroutine("color_change");
-        yield return null;
-    }
+            float temp_time0 = Time.time;
+            if (time >= 0)
+            {
+                
+                material.color = Color.Lerp(Color.white, color, Mathf.PingPong(Time.time * speed, 1));
+                time -= temp_time0 - temp_time1 ;
+            }
+            else
+            {
+                if (material.color != Color.white) material.color = Color.Lerp(material.color, Color.white, 1);
 
+                else StopCoroutine("color_changer");
+
+            }
+            //  speed -= time * 0.02f;
+             temp_time1 = Time.time;
+            yield return new WaitForSeconds(0.02f);
+        }
+    }
     /*
       color change
       void get color
